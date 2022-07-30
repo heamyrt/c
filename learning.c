@@ -186,3 +186,51 @@ int main() {
 	airele(&l,10);
 }
  
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+#include<float.h>
+//数组实现链表
+#define maxsize 100
+typedef struct {
+	int data;
+	int cur;
+}compare, slinklist[maxsize];			//结构体名字,两个数组元素构成元素，重新分配地址指针（数组中的位序）
+void initit(slinklist s) {
+	for (int i = 0; i < maxsize; i++) {
+		s[i].cur = i + 1;
+	}
+	s[maxsize - 1].cur = 0;				//slinklist是建立100个元素（compare）的数组，对数组进行排序
+}
+int malloc_sl(slinklist s) {			//如malloc一般，提供下一个数据结构的地址
+	int k = s[0].cur;
+	s[0].cur = s[k].cur;				//取得头个元素的标记，将头元素弹出
+	return k;
+}
+void free(slinklist l,int k) {
+	l[k].cur = l[0].cur;
+	l[0].cur = k;
+}
+void bianli(slinklist l,int k) {
+	while (l[k].cur) {
+		k = l[k].cur;
+		printf("%d\n", l[k].data);
+	}
+}
+int main() {
+	slinklist l;
+	initit(l);
+	int k;
+	//compare m;					//直接从备用列表中弹出
+	//  m.cur = 0;
+	k = malloc_sl(l);				//链表头
+	l[k].cur = 0;
+	int r = k;
+	for (int i = 0; i < 10; i++) {
+		i = malloc_sl(l);
+		l[i].data = rand();
+		l[i].cur = l[r].cur;
+		l[r].cur = i;
+	}
+	bianli(l, k);
+}
