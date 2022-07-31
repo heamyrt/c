@@ -234,3 +234,51 @@ int main() {
 	}
 	bianli(l, k);
 }
+//栈
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+#include<float.h>
+#define maxsize 100
+#define onesize 10
+//顺序站的定义
+typedef struct {
+	int* base;
+	int* top;
+	int  sqstacksize;
+}sqstack;
+void initsqstack(sqstack* l) {
+	int* k = (int*)malloc(maxsize * sizeof(int));
+	l->base = k;
+	l->top = k;
+	l->sqstacksize = maxsize;
+}
+int push(sqstack* l,int e) {
+	if (l->top==l->base+l->sqstacksize)
+	{
+		int *k = (int*)malloc((maxsize + onesize) * sizeof(int));
+		if(!k){
+			return 0;
+		}
+		l->base = k;
+		l->sqstacksize = l->base + onesize;
+	}
+//  (l->top) = e;				//不知道调用的是指针的地址，还是指针所指的元素
+	* l->top = e;
+	l->top = l->top + 1;
+}
+int pop(sqstack* l, int *e) {
+	if (l->base == l->top) {
+		return 0;
+	}
+	*e = *(l->top - 1);
+	l->top = l->top - 1;
+	printf("%d", *e);
+}
+void main() {
+	sqstack l;
+	int s;
+	initsqstack(&l);
+	push(&l, 6);
+	pop(&l, &s);
+}
