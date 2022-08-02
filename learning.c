@@ -282,3 +282,31 @@ void main() {
 	push(&l, 6);
 	pop(&l, &s);
 }
+
+
+//对函数参数的调用使用
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+#include<float.h>
+#include<stdarg.h>
+int sum(int, ...);		//预定义输出的类型
+int main(void) {
+	printf("10，20，和30 =%d\n", sum(3, 10, 20, 30));
+	printf("4，5，10，54和11 =%d\n", sum(4, 5, 10, 54, 11));
+	return 0;
+}
+int sum(int num_args, ...) {	//因为是多参数，要对多参数进行调用与使用
+	int val = 0;
+	int i = 0;
+	va_list sq;
+	
+	va_start(sq,num_args);
+	for (i = 0; i < num_args; i++) {
+		val = val + va_arg(sq, int);
+		printf("%d",num_args);		//num_args 是指参数的个数
+	}
+	va_end(sq);
+
+	return val;
+}
