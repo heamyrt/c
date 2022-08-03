@@ -310,3 +310,84 @@ int sum(int num_args, ...) {	//因为是多参数，要对多参数进行调用�
 
 	return val;
 }
+
+
+//错误代码（整理一半）
+#include<stdarg.h>
+#include<malloc.h>
+#include<stdio.h>
+#include<stdlib.h>
+#include<io.h>
+#include<math.h>
+//确定数据结构，基址，维度数量，维度个数，维度映射
+typedef struct {
+	int* base;
+	int dim;
+	int* bounds;
+	int* constants;
+}array;
+void initarray(array* l,int dim,...) {
+	l->dim = dim;
+	if (l->dim < 0 && l->dim > 8) {
+		return 0;
+	}
+	l->bounds = (int*)malloc(l->dim * sizeof(int));
+	if (!l->bounds) { return 0; }
+	int elemtotal=1;
+	va_list sq;
+	va_start(sq, l->dim);
+	for (int i = 0; i < l->dim; i++) {
+//		l->bounds[i] = va_arg(sq, int);			//输入的数据不对
+		l->bounds[i] = va_arg(sq, int);
+//		elemtotal = elemtotal * va_arg(sq, int);		//因为这的调用，使va_ary又遍历了1位
+		elemtotal = elemtotal * l->bounds[i];
+	}
+	va_end(sq);
+	l->base = (int*)malloc(elemtotal * sizeof(int));
+	if (!l->base) { return 0; }
+	l->constants = (int*)malloc(l->dim * sizeof(int));
+	l->constants[dim - 1] = 1;
+	for (int j = dim - 2; j >= 0; j--) {  //dim-2	数组从零开始减少1，dim-1确定-1
+		l->constants[j] = l->bounds[j + 1] * l->constants[j + 1];
+	}
+	return 1;
+}
+void locate(array l, va_list sp, int* el) {
+	*el = 0;
+	for (int i = 0; i < l.dim; i++) {
+		int ind = va_arg(sp, int);
+		*el += l.bounds[i]*l.dim;
+		
+	}
+	return 1;
+}
+void value(array l, int* e, ...) {
+	va_list sp;
+	int el;
+	va_start(sp, e);
+	locate(l, sp, &el);
+	*e = el + l.base;
+}
+void assign(array* l, int e, ...) {
+	va_list sq;
+	int el;
+	va_start(sq, e);
+	locate(*l, sq, &el);
+	*(l->base + el) = e;
+}
+void main()
+{
+	array l;
+	initarray(&l, 3, 2, 2);
+	int dim = l.dim;
+	int e;
+	for (int i = 0; i < l.bounds[dim - 1]; i++) {
+		for (int j = 0; j < l.bounds[dim - 2]; j++) {
+			for (int k = 0; k < l.bounds[dim - 3]; k++) {
+				assign(&l, i + j + k, i, j, k);
+				value(l, &e, i, j, k);
+				printf("%d\n", e);
+			}
+		}
+	}
+}
